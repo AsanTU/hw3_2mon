@@ -1,8 +1,10 @@
 package com.example.hw3_2mon;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -18,7 +20,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView textRes;
     private double firstVar = 0;
     private String operation = "";
+    private String currentInput = "";
     private boolean isOperationClick = false;
+    private Button resultBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         textRes = findViewById(R.id.tv_res);
+        resultBtn = findViewById(R.id.btn_show_result);
     }
 
     public void onNumberClick(View view) {
@@ -42,45 +47,67 @@ public class MainActivity extends AppCompatActivity {
             textRes.setText("0");
             firstVar = 0;
             operation = "";
+            currentInput = "";
+            resultBtn.setVisibility(View.GONE);
             return;
         }
 
         if (isOperationClick || current.equals("0")) textRes.setText(textBtn);
         else textRes.append(textBtn);
         isOperationClick = false;
+        currentInput += textBtn;
+        resultBtn.setVisibility(View.GONE);
     }
 
     public void onOperationClick(View view) {
         String op = ((MaterialButton) view).getText().toString();
 
         if (op.equals("=")) {
-            double secondVar = Double.parseDouble(textRes.getText().toString());
+            double secondVar = Double.parseDouble(currentInput);
+            double result = 0;
 
             switch (operation){
                 case "+":
-                    textRes.setText(removeDot(firstVar + secondVar));
+                    result = firstVar + secondVar;
                     break;
                 case "-":
-                    textRes.setText(removeDot(firstVar - secondVar));
+                    result = firstVar - secondVar;
                     break;
                 case "X":
-                    textRes.setText(removeDot(firstVar * secondVar));
+                    result = firstVar * secondVar;
                     break;
                 case "/":
-                    if (secondVar != 0) textRes.setText(removeDot(firstVar / secondVar));
-                    else textRes.setText("Ошибка");
+                    if (secondVar != 0) {
+                        result = firstVar / secondVar;
+                    } else {
+                        textRes.setText("Ошибка");
+                        return;
+                    }
                     break;
             }
+
+            textRes.setText(removeDot(result));
+            currentInput = String.valueOf(result);
+            resultBtn.setVisibility(View.VISIBLE);
         } else {
             firstVar = Double.parseDouble(textRes.getText().toString());
             operation = op;
             isOperationClick = true;
+            currentInput = "";
+            resultBtn.setVisibility(View.GONE);
         }
     }
+
 
     @SuppressLint("DefaultLocale")
     private String removeDot(double res){
         if (res == (long) res) return String.format("%d", (long) res);
         else return String.format("%s", res);
+    }
+
+    public void onShowResultClick(View view){
+        Intent intent = new Intent(this, SecondActivity.class);
+        intent.putExtra("result", textRes.getText().toString());
+        startActivity(intent);
     }
 }
