@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     @SuppressLint("DefaultLocale")
     private String removeDot(double res){
         if (res == (long) res) return String.format("%d", (long) res);
